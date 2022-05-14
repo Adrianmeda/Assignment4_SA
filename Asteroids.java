@@ -381,6 +381,9 @@ public class Asteroids extends Applet implements Runnable {
   int fontWidth  = fm.getMaxAdvance();
   int fontHeight = fm.getHeight();
 
+  static Controller controller = new Controller();
+  Game game = controller.getGame();
+
   public String getAppletInfo() {
 
     // Return copyright information.
@@ -398,7 +401,7 @@ public class Asteroids extends Applet implements Runnable {
     System.out.println(copyText);
 
     // Set up key event handling and set focus to applet window.
-    Controller controller = new Controller();
+
     addKeyListener(controller);
     requestFocus();
 
@@ -444,6 +447,7 @@ public class Asteroids extends Applet implements Runnable {
     highScore = 0;
     sound = true;
     detail = true;
+    game.initGame();
     initGame();
     endGame();
   }
@@ -575,38 +579,55 @@ public class Asteroids extends Applet implements Runnable {
     // Load all sound clips by playing and immediately stopping them. Update
     // counter and total for display.
 
+
+
     try {
+      game.crashSound = getAudioClip(new URL(getCodeBase(), "crash.au"));
+      clipTotal++;
+      game.explosionSound = getAudioClip(new URL(getCodeBase(), "explosion.au"));
+      clipTotal++;
+      game.fireSound      = getAudioClip(new URL(getCodeBase(), "fire.au"));
+      clipTotal++;
+      game.missleSound    = getAudioClip(new URL(getCodeBase(), "missle.au"));
+      clipTotal++;
+      game.saucerSound    = getAudioClip(new URL(getCodeBase(), "saucer.au"));
+      clipTotal++;
+      game.thrustersSound = getAudioClip(new URL(getCodeBase(), "thrusters.au"));
+      clipTotal++;
+      game.warpSound      = getAudioClip(new URL(getCodeBase(), "warp.au"));
+      clipTotal++;
+
       crashSound     = getAudioClip(new URL(getCodeBase(), "crash.au"));
-      clipTotal++;
+
       explosionSound = getAudioClip(new URL(getCodeBase(), "explosion.au"));
-      clipTotal++;
+
       fireSound      = getAudioClip(new URL(getCodeBase(), "fire.au"));
-      clipTotal++;
+
       missleSound    = getAudioClip(new URL(getCodeBase(), "missle.au"));
-      clipTotal++;
+
       saucerSound    = getAudioClip(new URL(getCodeBase(), "saucer.au"));
-      clipTotal++;
+
       thrustersSound = getAudioClip(new URL(getCodeBase(), "thrusters.au"));
-      clipTotal++;
+
       warpSound      = getAudioClip(new URL(getCodeBase(), "warp.au"));
-      clipTotal++;
+
     }
     catch (MalformedURLException e) {}
 
     try {
-      crashSound.play();     crashSound.stop();     clipsLoaded++;
+      game.crashSound.play();     game.crashSound.stop();     clipsLoaded++;
       repaint(); Thread.currentThread().sleep(DELAY);
-      explosionSound.play(); explosionSound.stop(); clipsLoaded++;
+      game.explosionSound.play(); game.explosionSound.stop(); clipsLoaded++;
       repaint(); Thread.currentThread().sleep(DELAY);
-      fireSound.play();      fireSound.stop();      clipsLoaded++;
+      game.fireSound.play();      game.fireSound.stop();      clipsLoaded++;
       repaint(); Thread.currentThread().sleep(DELAY);
-      missleSound.play();    missleSound.stop();    clipsLoaded++;
+      game.missleSound.play();    game.missleSound.stop();    clipsLoaded++;
       repaint(); Thread.currentThread().sleep(DELAY);
-      saucerSound.play();    saucerSound.stop();    clipsLoaded++;
+      game.saucerSound.play();    game.saucerSound.stop();    clipsLoaded++;
       repaint(); Thread.currentThread().sleep(DELAY);
-      thrustersSound.play(); thrustersSound.stop(); clipsLoaded++;
+      game.thrustersSound.play(); game.thrustersSound.stop(); clipsLoaded++;
       repaint(); Thread.currentThread().sleep(DELAY);
-      warpSound.play();      warpSound.stop();      clipsLoaded++;
+      game.warpSound.play();      game.warpSound.stop();      clipsLoaded++;
       repaint(); Thread.currentThread().sleep(DELAY);
     }
     catch (InterruptedException e) {}

@@ -1,10 +1,13 @@
-import java.applet.AudioClip;
-import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.net.URL;
 
 public class Controller implements KeyListener, Runnable {
+
+    private Game game = new Game();
+
+    public Game getGame() {
+        return game;
+    }
 
     public void keyTyped(KeyEvent e) {}
 
@@ -13,18 +16,31 @@ public class Controller implements KeyListener, Runnable {
 
         // Check if any cursor keys where released and set flags.
 
-        if (e.getKeyCode() == KeyEvent.VK_LEFT)
+        if (e.getKeyCode() == KeyEvent.VK_LEFT) {
             Asteroids.left = false;
-        if (e.getKeyCode() == KeyEvent.VK_RIGHT)
+            game.setLeft(false);
+        }
+        if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
             Asteroids.right = false;
-        if (e.getKeyCode() == KeyEvent.VK_UP)
+            game.setRight(false);
+        }
+        if (e.getKeyCode() == KeyEvent.VK_UP){
             Asteroids.up = false;
-        if (e.getKeyCode() == KeyEvent.VK_DOWN)
+            game.setUp(false);
+
+        }
+        if (e.getKeyCode() == KeyEvent.VK_DOWN){
             Asteroids.down = false;
+            game.setDown(false);
+
+        }
 
         if (!Asteroids.up && !Asteroids.down && Asteroids.thrustersPlaying) {
             Asteroids.thrustersSound.stop();
             Asteroids.thrustersPlaying = false;
+
+            //game.thrustersSound.stop();
+            //game.thrustersPlaying = false;
         }
     }
 
@@ -36,16 +52,24 @@ public class Controller implements KeyListener, Runnable {
 
         // Check if any cursor keys have been pressed and set flags.
 
-        if (e.getKeyCode() == KeyEvent.VK_LEFT)
+        if (e.getKeyCode() == KeyEvent.VK_LEFT) {
             Asteroids.left = true;
-        if (e.getKeyCode() == KeyEvent.VK_RIGHT)
+            game.setLeft(true);
+        }
+        if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
             Asteroids.right = true;
-        if (e.getKeyCode() == KeyEvent.VK_UP)
+            game.setRight(true);
+        }
+        if (e.getKeyCode() == KeyEvent.VK_UP) {
             Asteroids.up = true;
-        if (e.getKeyCode() == KeyEvent.VK_DOWN)
+            game.setUp(true);
+        }
+        if (e.getKeyCode() == KeyEvent.VK_DOWN) {
             Asteroids.down = true;
+            game.setDown(true);
+        }
 
-        if ((Asteroids.up || Asteroids.down) && Asteroids.ship.isActive() && !Asteroids.thrustersPlaying) {
+        if ((game.isUp() || game.isDown()) && Asteroids.ship.isActive() && !Asteroids.thrustersPlaying) {
             if (Asteroids.sound && !Asteroids.paused)
                 Asteroids.thrustersSound.loop();
             Asteroids.thrustersPlaying = true;
@@ -137,6 +161,7 @@ public class Controller implements KeyListener, Runnable {
 
         if (c == 's' && Asteroids.loaded && !Asteroids.playing)
             Asteroids.initGame();
+            game.initGame();
 
         // 'HOME' key: jump to web site (undocumented).
 
