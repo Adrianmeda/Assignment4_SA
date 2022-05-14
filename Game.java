@@ -122,7 +122,7 @@ public class Game {
     // Explosion data.
 
     int[] explosionCounter = new int[MAX_SCRAP];  // Time counters for explosions.
-    int explosionIndex;                         // Next available explosion sprite.
+    static int explosionIndex;                         // Next available explosion sprite.
 
     // Sound clips.
 
@@ -211,11 +211,38 @@ public class Game {
         return loaded;
     }
 
+    public boolean isDetail() {
+        return detail;
+    }
+
+
+    public int getScore() {
+        return score;
+    }
+
+    public int getHighScore() {
+        return highScore;
+    }
+
+    public int getShipsLeft() {
+        return shipsLeft;
+    }
+
+    public int[] getExplosionCounter() {
+        return explosionCounter;
+    }
+
     public Ship getShip() {
         return ship;
     }
 
+    public Photon[] getPhotons() {
+        return photons;
+    }
 
+    public Missile getMissle() {
+        return missle;
+    }
 
     //setters ----------------------------------------------
 
@@ -241,6 +268,10 @@ public class Game {
 
     public void setLoaded(boolean loaded) {
         this.loaded = loaded;
+    }
+
+    public void setDetail(boolean detail) {
+        this.detail = detail;
     }
 
     //initiators ----------------------------------------------
@@ -379,10 +410,10 @@ public class Game {
 
     //update methods -----------------------------------------
 
-    public void updateGame() {
+    public boolean updateGame() {
         // Move and process all sprites.
 
-        updateShip();
+        boolean shipUpdate = updateShip();
         updatePhotons();
         updateUfo();
         updateMissle();
@@ -410,12 +441,13 @@ public class Game {
             if (--asteroidsCounter <= 0)
                 initAsteroids();
 
+        return shipUpdate;
+
     }
 
     public boolean updateShip() {
-        boolean stopGame = false;
         if (!playing)
-            return stopGame;
+            return false;
 
         // Rotate the ship if left or right cursor key is down.
 
@@ -620,5 +652,38 @@ public class Game {
             return;
 
         missle.guide(ship);
+    }
+
+    public void firePhoton() {
+        if (sound & !paused)
+            fireSound.play();
+        photonTime = System.currentTimeMillis();
+        photonIndex++;
+        if (photonIndex >= Asteroids.MAX_SHOTS)
+            photonIndex = 0;
+        photons[photonIndex].active = true;
+        photons[photonIndex].x = ship.x;
+        photons[photonIndex].y = ship.y;
+        photons[photonIndex].deltaX = 2 * MAX_ROCK_SPEED * -Math.sin(ship.angle);
+        photons[photonIndex].deltaY = 2 * MAX_ROCK_SPEED *  Math.cos(ship.angle);
+    }
+
+    public void warpShip() {
+        ship.setX(Math.random() * AsteroidsSprite.width);
+        ship.setY(Math.random() * AsteroidsSprite.height);
+        hyperCounter = HYPER_COUNT;
+
+        if (sound & !paused)
+            warpSound.play();
+    }
+
+    public void mute() {
+        crashSound.stop();
+        explosionSound.stop();
+        fireSound.stop();
+        missleSound.stop();
+        saucerSound.stop();
+        thrustersSound.stop();
+        warpSound.stop();
     }
 }
