@@ -930,7 +930,6 @@ public class Asteroids extends Applet implements Runnable {
   }
 
   public void update(Graphics g) {
-
     paint(g);
   }
 
