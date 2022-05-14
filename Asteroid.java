@@ -41,4 +41,26 @@ public class Asteroid extends AsteroidsSprite{
 
     }
 
+    public void generateSmallAsteroid(double tempX, double tempY, double asteroidsSpeed) {
+        this.shape = new Polygon();
+        int s = Asteroids.MIN_ROCK_SIDES + (int) (Math.random() * (Asteroids.MAX_ROCK_SIDES - Asteroids.MIN_ROCK_SIDES));
+        for (int j = 0; j < s; j ++) {
+            double theta = 2 * Math.PI / s * j;
+            double r = (Asteroids.MIN_ROCK_SIZE + (int) (Math.random() * (Asteroids.MAX_ROCK_SIZE - Asteroids.MIN_ROCK_SIZE))) / 2;
+            int x = (int) -Math.round(r * Math.sin(theta));
+            int y = (int)  Math.round(r * Math.cos(theta));
+            this.shape.addPoint(x, y);
+        }
+
+        this.active = true;
+        this.angle = 0.0;
+        this.deltaAngle = Math.random() * 2 * Asteroids.MAX_ROCK_SPIN - Asteroids.MAX_ROCK_SPIN;
+        this.x = tempX;
+        this.y = tempY;
+        this.deltaX = Math.random() * 2 * asteroidsSpeed - asteroidsSpeed;
+        this.deltaY = Math.random() * 2 * asteroidsSpeed - asteroidsSpeed;
+
+
+    }
+
 }

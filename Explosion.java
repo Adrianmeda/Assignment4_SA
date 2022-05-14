@@ -7,4 +7,8 @@ public class Explosion extends AsteroidsSprite{
         this.active = false;
     }
 
+    public void setShape(AsteroidsSprite sprite) {
+
+    }
+
 }

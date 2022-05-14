@@ -34,6 +34,7 @@
 ******************************************************************************/
 
 import java.applet.Applet;
+import java.applet.AppletContext;
 import java.applet.AudioClip;
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -165,20 +166,58 @@ abstract class AsteroidsSprite {
   public void activate() {
     this.active = true;
   }
+
+  public Shape getShape() { return  this.shape; }
+
+  public void explode(Explosion[] explosions, int[] explosionCounter, boolean detail) {
+    int c, i, j;
+    int cx, cy;
+
+    c = 2;
+    if (detail || this.sprite.npoints < 6)
+      c = 1;
+    for (i = 0; i < this.sprite.npoints; i += c) {
+      Asteroids.explosionIndex++;
+      if (Asteroids.explosionIndex >= Asteroids.MAX_SCRAP)
+        Asteroids.explosionIndex = 0;
+      explosions[Asteroids.explosionIndex].activate();
+      explosions[Asteroids.explosionIndex].shape = new Polygon();
+      j = i + 1;
+      if (j >= this.sprite.npoints)
+        j -= this.sprite.npoints;
+      cx = (int) ((this.shape.xpoints[i] + this.shape.xpoints[j]) / 2);
+      cy = (int) ((this.shape.ypoints[i] + this.shape.ypoints[j]) / 2);
+      explosions[Asteroids.explosionIndex].shape.addPoint(
+              this.shape.xpoints[i] - cx,
+              this.shape.ypoints[i] - cy);
+      explosions[Asteroids.explosionIndex].shape.addPoint(
+              this.shape.xpoints[j] - cx,
+              this.shape.ypoints[j] - cy);
+      explosions[Asteroids.explosionIndex].x = this.x + cx;
+      explosions[Asteroids.explosionIndex].y = this.y + cy;
+      explosions[Asteroids.explosionIndex].angle = this.angle;
+      explosions[Asteroids.explosionIndex].deltaAngle = 4 * (Math.random() * 2 * Asteroids.MAX_ROCK_SPIN - Asteroids.MAX_ROCK_SPIN);
+      explosions[Asteroids.explosionIndex].deltaX = (Math.random() * 2 * Asteroids.MAX_ROCK_SPEED - Asteroids.MAX_ROCK_SPEED + this.deltaX) / 2;
+      explosions[Asteroids.explosionIndex].deltaY = (Math.random() * 2 * Asteroids.MAX_ROCK_SPEED - Asteroids.MAX_ROCK_SPEED + this.deltaY) / 2;
+      explosionCounter[Asteroids.explosionIndex] = Asteroids.SCRAP_COUNT;
+    }
+
+  }
+
 }
 
 /******************************************************************************
   Main applet code.
 ******************************************************************************/
 
-public class Asteroids extends Applet implements Runnable, KeyListener {
+public class Asteroids extends Applet implements Runnable {
 
   // Copyright information.
 
   String copyName = "Asteroids";
   String copyVers = "Version 1.3";
   String copyInfo = "Copyright 1998-2001 by Mike Hall";
-  String copyLink = "http://www.brainjar.com";
+  static String copyLink = "http://www.brainjar.com";
   String copyText = copyName + '\n' + copyVers + '\n'
                   + copyInfo + '\n' + copyLink;
 
@@ -242,23 +281,23 @@ public class Asteroids extends Applet implements Runnable, KeyListener {
 
   // Background stars.
 
-  int     numStars;
-  Point[] stars;
+  static int     numStars;
+  static Point[] stars;
 
   // Game data.
 
-  int score;
-  int highScore;
-  int newShipScore;
-  int newUfoScore;
+  static int score;
+  static int highScore;
+  static int newShipScore;
+  static int newUfoScore;
 
   // Flags for game state and options.
 
-  boolean loaded = false;
-  boolean paused;
-  boolean playing;
-  boolean sound;
-  boolean detail;
+  static boolean loaded = false;
+  static boolean paused;
+  static boolean playing;
+  static boolean sound;
+  static boolean detail;
 
   // Key flags.
 
@@ -278,7 +317,7 @@ public class Asteroids extends Applet implements Runnable, KeyListener {
 
   // Ship data.
 
-  int shipsLeft;       // Number of ships left in game, including current one.
+  static int shipsLeft;       // Number of ships left in game, including current one.
   int shipCounter;     // Timer counter for ship explosion.
   int hyperCounter;    // Timer counter for hyperspace.
 
@@ -289,24 +328,24 @@ public class Asteroids extends Applet implements Runnable, KeyListener {
 
   // Flying saucer data.
 
-  int ufoPassesLeft;    // Counter for number of flying saucer passes.
-  int ufoCounter;       // Timer counter used to track each flying saucer pass.
+  static int ufoPassesLeft;    // Counter for number of flying saucer passes.
+  static int ufoCounter;       // Timer counter used to track each flying saucer pass.
 
   // Missle data.
 
-  int missleCounter;    // Counter for life of missle.
+  static int missleCounter;    // Counter for life of missle.
 
   // Asteroid data.
 
-  boolean[] asteroidIsSmall = new boolean[MAX_ROCKS];    // Asteroid size flag.
-  int       asteroidsCounter;                            // Break-time counter.
-  double    asteroidsSpeed;                              // Asteroid speed.
-  int       asteroidsLeft;                               // Number of active asteroids.
+  static boolean[] asteroidIsSmall = new boolean[MAX_ROCKS];    // Asteroid size flag.
+  static int       asteroidsCounter;                            // Break-time counter.
+  static double    asteroidsSpeed;                              // Asteroid speed.
+  static int       asteroidsLeft;                               // Number of active asteroids.
 
   // Explosion data.
 
-  int[] explosionCounter = new int[MAX_SCRAP];  // Time counters for explosions.
-  int   explosionIndex;                         // Next available explosion sprite.
+  static int[] explosionCounter = new int[MAX_SCRAP];  // Time counters for explosions.
+  static int   explosionIndex;                         // Next available explosion sprite.
 
   // Sound clips.
 
@@ -326,8 +365,8 @@ public class Asteroids extends Applet implements Runnable, KeyListener {
 
   // Counter and total used to track the loading of the sound clips.
 
-  int clipTotal   = 0;
-  int clipsLoaded = 0;
+  static int clipTotal   = 0;
+  static int clipsLoaded = 0;
 
   // Off screen image.
 
@@ -359,8 +398,8 @@ public class Asteroids extends Applet implements Runnable, KeyListener {
     System.out.println(copyText);
 
     // Set up key event handling and set focus to applet window.
-
-    addKeyListener(this);
+    Controller controller = new Controller();
+    addKeyListener(controller);
     requestFocus();
 
     // Save the screen size.
@@ -505,7 +544,7 @@ public class Asteroids extends Applet implements Runnable, KeyListener {
           newShipScore += NEW_SHIP_POINTS;
           shipsLeft++;
         }
-        if (playing && score > newUfoScore && !ufo.active) {
+        if (playing && score > newUfoScore && !ufo.isActive()) {
           newUfoScore += NEW_UFO_POINTS;
           ufoPassesLeft = UFO_PASSES;
           initUfo();
@@ -573,7 +612,7 @@ public class Asteroids extends Applet implements Runnable, KeyListener {
     catch (InterruptedException e) {}
   }
 
-  public void initShip() {
+  public static void initShip() {
 
     // Reset the ship sprite at the center of the screen.
 
@@ -666,14 +705,14 @@ public class Asteroids extends Applet implements Runnable, KeyListener {
     // Move the flying saucer and check for collision with a photon. Stop it
     // when its counter has expired.
 
-    if (ufo.active) {
+    if (ufo.isActive()) {
       if (--ufoCounter <= 0) {
         if (--ufoPassesLeft > 0)
           initUfo();
         else
           stopUfo();
       }
-      if (ufo.active) {
+      if (ufo.isActive()) {
         ufo.advance();
         ufo.render();
         for (i = 0; i < MAX_SHOTS; i++)
@@ -698,7 +737,7 @@ public class Asteroids extends Applet implements Runnable, KeyListener {
     }
   }
 
-  public void stopUfo() {
+  public static void stopUfo() {
     ufo.stop();
     ufoCounter = 0;
     ufoPassesLeft = 0;
@@ -756,7 +795,7 @@ public class Asteroids extends Applet implements Runnable, KeyListener {
     missle.guide(ship);
   }
 
-  public void stopMissle() {
+  public static void stopMissle() {
 
     missle.stop();
     missleCounter = 0;
@@ -765,7 +804,7 @@ public class Asteroids extends Applet implements Runnable, KeyListener {
     misslePlaying = false;
   }
 
-  public void initAsteroids() {
+  public static void initAsteroids() {
 
     // Create random shapes, positions and movements for each asteroid.
 
@@ -784,11 +823,8 @@ public class Asteroids extends Applet implements Runnable, KeyListener {
   public void initSmallAsteroids(int n) {
 
     int count;
-    int i, j;
-    int s;
+    int i;
     double tempX, tempY;
-    double theta, r;
-    int x, y;
 
     // Create one or two smaller asteroids from a larger one using inactive
     // asteroids. The new asteroids will be placed in the same position as the
@@ -797,26 +833,11 @@ public class Asteroids extends Applet implements Runnable, KeyListener {
 
     count = 0;
     i = 0;
-    tempX = asteroids[n].x;
-    tempY = asteroids[n].y;
+    tempX = asteroids[n].getX();
+    tempY = asteroids[n].getY();
     do {
-      if (!asteroids[i].active) {
-        asteroids[i].shape = new Polygon();
-        s = MIN_ROCK_SIDES + (int) (Math.random() * (MAX_ROCK_SIDES - MIN_ROCK_SIDES));
-        for (j = 0; j < s; j ++) {
-          theta = 2 * Math.PI / s * j;
-          r = (MIN_ROCK_SIZE + (int) (Math.random() * (MAX_ROCK_SIZE - MIN_ROCK_SIZE))) / 2;
-          x = (int) -Math.round(r * Math.sin(theta));
-          y = (int)  Math.round(r * Math.cos(theta));
-          asteroids[i].shape.addPoint(x, y);
-        }
-        asteroids[i].active = true;
-        asteroids[i].angle = 0.0;
-        asteroids[i].deltaAngle = Math.random() * 2 * MAX_ROCK_SPIN - MAX_ROCK_SPIN;
-        asteroids[i].x = tempX;
-        asteroids[i].y = tempY;
-        asteroids[i].deltaX = Math.random() * 2 * asteroidsSpeed - asteroidsSpeed;
-        asteroids[i].deltaY = Math.random() * 2 * asteroidsSpeed - asteroidsSpeed;
+      if (!asteroids[i].isActive()) {
+        asteroids[i].generateSmallAsteroid(tempX, tempY, asteroidsSpeed);
         asteroids[i].render();
         asteroidIsSmall[i] = true;
         count++;
@@ -870,7 +891,7 @@ public class Asteroids extends Applet implements Runnable, KeyListener {
     }
   }
 
-  public void initExplosions() {
+  public static void initExplosions() {
 
     int i;
 
@@ -883,42 +904,13 @@ public class Asteroids extends Applet implements Runnable, KeyListener {
 
   public void explode(AsteroidsSprite s) {
 
-    int c, i, j;
-    int cx, cy;
-
     // Create sprites for explosion animation. The each individual line segment
     // of the given sprite is used to create a new sprite that will move
     // outward  from the sprite's original position with a random rotation.
 
     s.render();
-    c = 2;
-    if (detail || s.sprite.npoints < 6)
-      c = 1;
-    for (i = 0; i < s.sprite.npoints; i += c) {
-      explosionIndex++;
-      if (explosionIndex >= MAX_SCRAP)
-        explosionIndex = 0;
-      explosions[explosionIndex].active = true;
-      explosions[explosionIndex].shape = new Polygon();
-      j = i + 1;
-      if (j >= s.sprite.npoints)
-        j -= s.sprite.npoints;
-      cx = (int) ((s.shape.xpoints[i] + s.shape.xpoints[j]) / 2);
-      cy = (int) ((s.shape.ypoints[i] + s.shape.ypoints[j]) / 2);
-      explosions[explosionIndex].shape.addPoint(
-        s.shape.xpoints[i] - cx,
-        s.shape.ypoints[i] - cy);
-      explosions[explosionIndex].shape.addPoint(
-        s.shape.xpoints[j] - cx,
-        s.shape.ypoints[j] - cy);
-      explosions[explosionIndex].x = s.x + cx;
-      explosions[explosionIndex].y = s.y + cy;
-      explosions[explosionIndex].angle = s.angle;
-      explosions[explosionIndex].deltaAngle = 4 * (Math.random() * 2 * MAX_ROCK_SPIN - MAX_ROCK_SPIN);
-      explosions[explosionIndex].deltaX = (Math.random() * 2 * MAX_ROCK_SPEED - MAX_ROCK_SPEED + s.deltaX) / 2;
-      explosions[explosionIndex].deltaY = (Math.random() * 2 * MAX_ROCK_SPEED - MAX_ROCK_SPEED + s.deltaY) / 2;
-      explosionCounter[explosionIndex] = SCRAP_COUNT;
-    }
+    s.explode(explosions, explosionCounter, detail);
+
   }
 
   public void updateExplosions() {
@@ -1081,6 +1073,7 @@ public class Asteroids extends Applet implements Runnable, KeyListener {
   }
 
   public void paint(Graphics g) {
+
 
     Dimension d = getSize();
     int i;
