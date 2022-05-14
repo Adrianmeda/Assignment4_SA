@@ -301,30 +301,30 @@ public class Asteroids extends Applet implements Runnable {
 
   // Key flags.
 
-  boolean left  = false;
-  boolean right = false;
-  boolean up    = false;
-  boolean down  = false;
+  static boolean left  = false;
+  static boolean right = false;
+  static boolean up    = false;
+  static boolean down  = false;
 
   // Sprite objects.
 
-  Ship     ship;
-  Ufo      ufo;
-  Missile missle;
-  Photon[] photons    = new Photon[Photon.MAX_SHOTS];
-  Asteroid[] asteroids  = new Asteroid[MAX_ROCKS];
-  Explosion[] explosions = new Explosion[MAX_SCRAP];
+  static Ship     ship;
+  static Ufo      ufo;
+  static Missile missle;
+  static Photon[] photons    = new Photon[Photon.MAX_SHOTS];
+  static Asteroid[]  asteroids  = new Asteroid[MAX_ROCKS];
+  static Explosion[] explosions = new Explosion[MAX_SCRAP];
 
   // Ship data.
 
   static int shipsLeft;       // Number of ships left in game, including current one.
   int shipCounter;     // Timer counter for ship explosion.
-  int hyperCounter;    // Timer counter for hyperspace.
+  static int hyperCounter;    // Timer counter for hyperspace.
 
   // Photon data.
 
-  int   photonIndex = 0;    // Index to next available photon sprite.
-  long  photonTime;     // Time value used to keep firing rate constant.
+  static int   photonIndex = 0;    // Index to next available photon sprite.
+  static long  photonTime;     // Time value used to keep firing rate constant.
 
   // Flying saucer data.
 
@@ -349,19 +349,19 @@ public class Asteroids extends Applet implements Runnable {
 
   // Sound clips.
 
-  AudioClip crashSound;
-  AudioClip explosionSound;
-  AudioClip fireSound;
-  AudioClip missleSound;
-  AudioClip saucerSound;
-  AudioClip thrustersSound;
-  AudioClip warpSound;
+  static AudioClip crashSound;
+  static AudioClip explosionSound;
+  static AudioClip fireSound;
+  static AudioClip missleSound;
+  static AudioClip saucerSound;
+  static AudioClip thrustersSound;
+  static AudioClip warpSound;
 
   // Flags for looping sound clips.
 
-  boolean thrustersPlaying;
-  boolean saucerPlaying;
-  boolean misslePlaying;
+  static boolean thrustersPlaying;
+  static boolean saucerPlaying;
+  static boolean misslePlaying;
 
   // Counter and total used to track the loading of the sound clips.
 
@@ -448,7 +448,7 @@ public class Asteroids extends Applet implements Runnable {
     endGame();
   }
 
-  public void initGame() {
+  public static void initGame() {
 
     // Initialize game data and sprites.
 
@@ -928,144 +928,6 @@ public class Asteroids extends Applet implements Runnable {
           explosions[i].stop();
       }
   }
-
-  public void keyPressed(KeyEvent e) {
-
-    char c;
-
-    // Check if any cursor keys have been pressed and set flags.
-
-    if (e.getKeyCode() == KeyEvent.VK_LEFT)
-      left = true;
-    if (e.getKeyCode() == KeyEvent.VK_RIGHT)
-      right = true;
-    if (e.getKeyCode() == KeyEvent.VK_UP)
-      up = true;
-    if (e.getKeyCode() == KeyEvent.VK_DOWN)
-      down = true;
-
-    if ((up || down) && ship.isActive() && !thrustersPlaying) {
-      if (sound && !paused)
-        thrustersSound.loop();
-      thrustersPlaying = true;
-    }
-
-    // Spacebar: fire a photon and start its counter.
-
-    if (e.getKeyChar() == ' ' && ship.isActive()) {
-      if (sound & !paused)
-        fireSound.play();
-      photonTime = System.currentTimeMillis();
-      photonIndex++;
-      if (photonIndex >= MAX_SHOTS)
-        photonIndex = 0;
-      photons[photonIndex].active = true;
-      photons[photonIndex].x = ship.x;
-      photons[photonIndex].y = ship.y;
-      photons[photonIndex].deltaX = 2 * MAX_ROCK_SPEED * -Math.sin(ship.angle);
-      photons[photonIndex].deltaY = 2 * MAX_ROCK_SPEED *  Math.cos(ship.angle);
-    }
-
-    // Allow upper or lower case characters for remaining keys.
-
-    c = Character.toLowerCase(e.getKeyChar());
-
-    // 'H' key: warp ship into hyperspace by moving to a random location and
-    // starting counter.
-
-    if (c == 'h' && ship.isActive() && hyperCounter <= 0) {
-      ship.x = Math.random() * AsteroidsSprite.width;
-      ship.y = Math.random() * AsteroidsSprite.height;
-      hyperCounter = HYPER_COUNT;
-      if (sound & !paused)
-        warpSound.play();
-    }
-
-    // 'P' key: toggle pause mode and start or stop any active looping sound
-    // clips.
-
-    if (c == 'p') {
-      if (paused) {
-        if (sound && misslePlaying)
-          missleSound.loop();
-        if (sound && saucerPlaying)
-          saucerSound.loop();
-        if (sound && thrustersPlaying)
-          thrustersSound.loop();
-      }
-      else {
-        if (misslePlaying)
-          missleSound.stop();
-        if (saucerPlaying)
-          saucerSound.stop();
-        if (thrustersPlaying)
-          thrustersSound.stop();
-      }
-      paused = !paused;
-    }
-
-    // 'M' key: toggle sound on or off and stop any looping sound clips.
-
-    if (c == 'm' && loaded) {
-      if (sound) {
-        crashSound.stop();
-        explosionSound.stop();
-        fireSound.stop();
-        missleSound.stop();
-        saucerSound.stop();
-        thrustersSound.stop();
-        warpSound.stop();
-      }
-      else {
-        if (misslePlaying && !paused)
-          missleSound.loop();
-        if (saucerPlaying && !paused)
-          saucerSound.loop();
-        if (thrustersPlaying && !paused)
-          thrustersSound.loop();
-      }
-      sound = !sound;
-    }
-
-    // 'D' key: toggle graphics detail on or off.
-
-    if (c == 'd')
-      detail = !detail;
-
-    // 'S' key: start the game, if not already in progress.
-
-    if (c == 's' && loaded && !playing)
-      initGame();
-
-    // 'HOME' key: jump to web site (undocumented).
-
-    if (e.getKeyCode() == KeyEvent.VK_HOME)
-      try {
-        getAppletContext().showDocument(new URL(copyLink));
-      }
-      catch (Exception excp) {}
-  }
-
-  public void keyReleased(KeyEvent e) {
-
-    // Check if any cursor keys where released and set flags.
-
-    if (e.getKeyCode() == KeyEvent.VK_LEFT)
-      left = false;
-    if (e.getKeyCode() == KeyEvent.VK_RIGHT)
-      right = false;
-    if (e.getKeyCode() == KeyEvent.VK_UP)
-      up = false;
-    if (e.getKeyCode() == KeyEvent.VK_DOWN)
-      down = false;
-
-    if (!up && !down && thrustersPlaying) {
-      thrustersSound.stop();
-      thrustersPlaying = false;
-    }
-  }
-
-  public void keyTyped(KeyEvent e) {}
 
   public void update(Graphics g) {
 
