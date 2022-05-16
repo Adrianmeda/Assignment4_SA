@@ -63,18 +63,18 @@ public class Game {
 
     // Game data.
 
-    int score;
-    int highScore;
-    int newShipScore;
-    int newUfoScore;
+    private int score;
+    private int highScore;
+    private int newShipScore;
+    private int newUfoScore;
 
     // Flags for game state and options.
 
-    boolean loaded = false;
-    boolean paused;
-    boolean playing;
-    boolean sound;
-    boolean detail;
+    private boolean loaded = false;
+    private boolean paused;
+    private boolean playing;
+    private boolean sound;
+    private boolean detail;
 
     // Key flags.
 
@@ -85,43 +85,44 @@ public class Game {
 
     // Sprite objects.
 
-    Ship ship;
-    Ufo ufo;
-    Missile missle;
-    Photon[] photons = new Photon[Photon.MAX_SHOTS];
-    Asteroid[] asteroids = new Asteroid[MAX_ROCKS];
-    Explosion[] explosions = new Explosion[MAX_SCRAP];
+    private Ship ship;
+    private Ufo ufo;
+    private Missile missle;
+    private Photon[] photons = new Photon[Photon.MAX_SHOTS];
+    private Asteroid[] asteroids = new Asteroid[MAX_ROCKS];
+    private Explosion[] explosions = new Explosion[MAX_SCRAP];
 
     // Ship data.
 
-    int shipsLeft;       // Number of ships left in game, including current one.
-    int shipCounter;     // Timer counter for ship explosion.
+    private int shipsLeft;       // Number of ships left in game, including current one.
+    private int shipCounter;     // Timer counter for ship explosion.
     static int hyperCounter;    // Timer counter for hyperspace.
+
 
     // Photon data.
 
-    int photonIndex = 0;    // Index to next available photon sprite.
-    long photonTime;     // Time value used to keep firing rate constant.
+    private int photonIndex = 0;    // Index to next available photon sprite.
+    private long photonTime;     // Time value used to keep firing rate constant.
 
     // Flying saucer data.
 
-    int ufoPassesLeft;    // Counter for number of flying saucer passes.
-    int ufoCounter;       // Timer counter used to track each flying saucer pass.
+    private int ufoPassesLeft;    // Counter for number of flying saucer passes.
+    private int ufoCounter;       // Timer counter used to track each flying saucer pass.
 
     // Missle data.
 
-    int missleCounter;    // Counter for life of missle.
+    private int missleCounter;    // Counter for life of missle.
 
     // Asteroid data.
 
-    boolean[] asteroidIsSmall = new boolean[MAX_ROCKS];    // Asteroid size flag.
-    int asteroidsCounter;                            // Break-time counter.
-    double asteroidsSpeed;                              // Asteroid speed.
-    int asteroidsLeft;                               // Number of active asteroids.
+    private boolean[] asteroidIsSmall = new boolean[MAX_ROCKS];    // Asteroid size flag.
+    private int asteroidsCounter;                            // Break-time counter.
+    private double asteroidsSpeed;                              // Asteroid speed.
+    private int asteroidsLeft;                               // Number of active asteroids.
 
     // Explosion data.
 
-    int[] explosionCounter = new int[MAX_SCRAP];  // Time counters for explosions.
+    private int[] explosionCounter = new int[MAX_SCRAP];  // Time counters for explosions.
     static int explosionIndex;                         // Next available explosion sprite.
 
     // Sound clips.
@@ -136,7 +137,7 @@ public class Game {
 
     // Flags for looping sound clips.
 
-    boolean thrustersPlaying;
+    private boolean thrustersPlaying;
     boolean saucerPlaying;
     boolean misslePlaying;
 
@@ -207,6 +208,13 @@ public class Game {
         return detail;
     }
 
+    public boolean isThrustersPlaying() {
+        return thrustersPlaying;
+    }
+
+    public boolean hasSound() {
+        return this.sound;
+    }
 
     public int getScore() {
         return score;
@@ -288,6 +296,14 @@ public class Game {
 
     public void setDetail(boolean detail) {
         this.detail = detail;
+    }
+
+    public void setSound(boolean sound) {
+        this.sound = sound;
+    }
+
+    public void setThrustersPlaying(boolean thrustersPlaying) {
+        this.thrustersPlaying = thrustersPlaying;
     }
 
     //initiators ----------------------------------------------

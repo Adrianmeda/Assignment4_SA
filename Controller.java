@@ -30,9 +30,9 @@ public class Controller implements KeyListener {
 
         }
 
-        if (!game.isUp() && !game.isDown() && game.thrustersPlaying) {
+        if (!game.isUp() && !game.isDown() && game.isThrustersPlaying()) {
             game.thrustersSound.stop();
-            game.thrustersPlaying = false;
+            game.setThrustersPlaying(false);
         }
     }
 
@@ -57,10 +57,10 @@ public class Controller implements KeyListener {
             game.setDown(true);
         }
 
-        if ((game.isUp() || game.isDown()) && game.getShip().isActive() && !game.thrustersPlaying) {
-            if (game.sound && !game.isPaused())
+        if ((game.isUp() || game.isDown()) && game.getShip().isActive() && !game.isThrustersPlaying()) {
+            if (game.hasSound() && !game.isPaused())
                 game.thrustersSound.loop();
-            game.thrustersPlaying = true;
+            game.setThrustersPlaying(true);
         }
 
         // Spacebar: fire a photon and start its counter.
@@ -76,7 +76,7 @@ public class Controller implements KeyListener {
         // 'H' key: warp ship into hyperspace by moving to a random location and
         // starting counter.
 
-        if (c == 'h' && game.getShip().isActive() && game.hyperCounter <= 0) {
+        if (c == 'h' && game.getShip().isActive() && Game.hyperCounter <= 0) {
            game.warpShip();
         }
 
@@ -85,11 +85,11 @@ public class Controller implements KeyListener {
 
         if (c == 'p') {
             if (game.isPaused()) {
-                if (game.sound && game.misslePlaying)
+                if (game.hasSound() && game.misslePlaying)
                     game.missleSound.loop();
-                if (game.sound && game.saucerPlaying)
+                if (game.hasSound() && game.saucerPlaying)
                     game.saucerSound.loop();
-                if (game.sound && game.thrustersPlaying)
+                if (game.hasSound() && game.isThrustersPlaying())
                     game.thrustersSound.loop();
             }
             else {
@@ -97,7 +97,7 @@ public class Controller implements KeyListener {
                     game.missleSound.stop();
                 if (game.saucerPlaying)
                     game.saucerSound.stop();
-                if (game.thrustersPlaying)
+                if (game.isThrustersPlaying())
                     game.thrustersSound.stop();
             }
             game.setPaused(!game.isPaused());
@@ -107,18 +107,18 @@ public class Controller implements KeyListener {
         // 'M' key: toggle sound on or off and stop any looping sound clips.
 
         if (c == 'm' && game.isLoaded()) {
-            if (game.sound) {
+            if (game.hasSound()) {
                 game.mute();
             }
             else {
-                if (game.misslePlaying && !game.paused)
+                if (game.misslePlaying && !game.isPaused())
                     game.missleSound.loop();
-                if (game.saucerPlaying && !game.paused)
+                if (game.saucerPlaying && !game.isPaused())
                     game.saucerSound.loop();
-                if (game.thrustersPlaying && !game.paused)
+                if (game.isThrustersPlaying() && !game.isPaused())
                     game.thrustersSound.loop();
             }
-            game.sound = !game.sound;
+            game.setSound(!game.hasSound());
         }
 
         // 'D' key: toggle graphics detail on or off.

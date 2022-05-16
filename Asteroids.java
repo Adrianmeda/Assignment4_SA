@@ -427,7 +427,7 @@ public class Asteroids extends Applet implements Runnable {
     this.drawAsteroids(game.getAsteroids(), game.isDetail());
 
     // Draw the flying saucer.
-    if (game.ufo.active) {
+    if (game.getUfo().isActive()) {
       this.drawFlyingSaucer(game.getUfo(), game.isDetail());
     }
 
@@ -499,7 +499,7 @@ public class Asteroids extends Applet implements Runnable {
     }
     offGraphics.setColor(Color.white);
     offGraphics.drawPolygon(ufo.getSprite());
-    offGraphics.drawLine(ufo.getSprite().xpoints[game.ufo.sprite.npoints - 1], ufo.getSprite().ypoints[ufo.getSprite().npoints - 1],
+    offGraphics.drawLine(ufo.getSprite().xpoints[ufo.sprite.npoints - 1], ufo.getSprite().ypoints[ufo.getSprite().npoints - 1],
             ufo.getSprite().xpoints[0], ufo.getSprite().ypoints[0]);
 
   }
@@ -549,7 +549,7 @@ public class Asteroids extends Applet implements Runnable {
     offGraphics.drawString("Ships: " + game.getShipsLeft(), fontWidth, d.height - fontHeight);
     String s = "High: " + game.getHighScore();
     offGraphics.drawString(s, d.width - (fontWidth + fm.stringWidth(s)), fontHeight);
-    if (!game.sound) {
+    if (!game.hasSound()) {
       s = "Mute";
       offGraphics.drawString(s, d.width - (fontWidth + fm.stringWidth(s)), d.height - fontHeight);
     }
