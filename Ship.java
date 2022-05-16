@@ -1,8 +1,8 @@
 public class Ship extends AsteroidsSprite{
 
-    static final double SHIP_ANGLE_STEP = Math.PI / Asteroids.FPS;
-    static final double SHIP_SPEED_STEP = 15.0 / Asteroids.FPS;
-    static final double MAX_SHIP_SPEED  = 1.25 * Asteroids.MAX_ROCK_SPEED;
+    static final double SHIP_ANGLE_STEP = Math.PI / Game.FPS;
+    static final double SHIP_SPEED_STEP = 15.0 / Game.FPS;
+    static final double MAX_SHIP_SPEED  = 1.25 * Game.MAX_ROCK_SPEED;
 
     private FwdThruster fwdThruster;
     private RevThruster revThruster;

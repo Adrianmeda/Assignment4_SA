@@ -46,7 +46,7 @@ public class Missile extends AsteroidsSprite{
 
         // Change the missle's angle so that it points toward the ship.
 
-        this.deltaX = 0.75 * Asteroids.MAX_ROCK_SPEED * -Math.sin(this.angle);
-        this.deltaY = 0.75 * Asteroids.MAX_ROCK_SPEED *  Math.cos(this.angle);
+        this.deltaX = 0.75 * Game.MAX_ROCK_SPEED * -Math.sin(this.angle);
+        this.deltaY = 0.75 * Game.MAX_ROCK_SPEED *  Math.cos(this.angle);
     }
 }

@@ -24,7 +24,7 @@ public class Ufo extends AsteroidsSprite{
         this.x = -AsteroidsSprite.width / 2;
         this.y = Math.random() * 2 * AsteroidsSprite.height - AsteroidsSprite.height;
         angle = Math.random() * Math.PI / 4 - Math.PI / 2;
-        speed = Asteroids.MAX_ROCK_SPEED / 2 + Math.random() * (Asteroids.MAX_ROCK_SPEED / 2);
+        speed = Game.MAX_ROCK_SPEED / 2 + Math.random() * (Game.MAX_ROCK_SPEED / 2);
         this.deltaX = speed * -Math.sin(angle);
         this.deltaY = speed *  Math.cos(angle);
         if (Math.random() < 0.5) {

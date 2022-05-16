@@ -90,8 +90,6 @@ abstract class AsteroidsSprite {
     return this.y;
   }
 
-  public Shape getShape() { return  this.shape; }
-
   public Polygon getSprite() {
     return sprite;
   }
@@ -194,7 +192,7 @@ abstract class AsteroidsSprite {
       c = 1;
     for (i = 0; i < this.sprite.npoints; i += c) {
       Game.explosionIndex++;
-      if (Game.explosionIndex >= Asteroids.MAX_SCRAP)
+      if (Game.explosionIndex >= Game.MAX_SCRAP)
         Game.explosionIndex = 0;
       explosions[Game.explosionIndex].activate();
       explosions[Game.explosionIndex].shape = new Polygon();
@@ -212,10 +210,10 @@ abstract class AsteroidsSprite {
       explosions[Game.explosionIndex].x = this.x + cx;
       explosions[Game.explosionIndex].y = this.y + cy;
       explosions[Game.explosionIndex].angle = this.angle;
-      explosions[Game.explosionIndex].deltaAngle = 4 * (Math.random() * 2 * Asteroids.MAX_ROCK_SPIN - Asteroids.MAX_ROCK_SPIN);
-      explosions[Game.explosionIndex].deltaX = (Math.random() * 2 * Asteroids.MAX_ROCK_SPEED - Asteroids.MAX_ROCK_SPEED + this.deltaX) / 2;
-      explosions[Game.explosionIndex].deltaY = (Math.random() * 2 * Asteroids.MAX_ROCK_SPEED - Asteroids.MAX_ROCK_SPEED + this.deltaY) / 2;
-      explosionCounter[Game.explosionIndex] = Asteroids.SCRAP_COUNT;
+      explosions[Game.explosionIndex].deltaAngle = 4 * (Math.random() * 2 * Game.MAX_ROCK_SPIN - Game.MAX_ROCK_SPIN);
+      explosions[Game.explosionIndex].deltaX = (Math.random() * 2 * Game.MAX_ROCK_SPEED - Game.MAX_ROCK_SPEED + this.deltaX) / 2;
+      explosions[Game.explosionIndex].deltaY = (Math.random() * 2 * Game.MAX_ROCK_SPEED - Game.MAX_ROCK_SPEED + this.deltaY) / 2;
+      explosionCounter[Game.explosionIndex] = Game.SCRAP_COUNT;
     }
 
   }
@@ -229,7 +227,6 @@ abstract class AsteroidsSprite {
 public class Asteroids extends Applet implements Runnable {
 
   // Copyright information.
-
   String copyName = "Asteroids";
   String copyVers = "Version 1.3";
   String copyInfo = "Copyright 1998-2001 by Mike Hall";
@@ -237,63 +234,25 @@ public class Asteroids extends Applet implements Runnable {
   String copyText = copyName + '\n' + copyVers + '\n'
                   + copyInfo + '\n' + copyLink;
 
-  AudioClip crashSound;
-  AudioClip explosionSound;
-  AudioClip fireSound;
-  AudioClip missleSound;
-  AudioClip saucerSound;
-  AudioClip thrustersSound;
-  AudioClip warpSound;
-
   // Thread control variables.
-
   Thread loadThread;
   Thread loopThread;
 
   // Constants
-
   static final int DELAY = 20;             // Milliseconds between screen and
   static final int FPS   =                 // the resulting frame rate.
     Math.round(1000 / DELAY);
 
-  static final int MAX_SHOTS =  8;          // Maximum number of sprites
-  static final int MAX_ROCKS =  8;          // for photons, asteroids and
-  static final int MAX_SCRAP = 40;          // explosions.
-
-  static final int SCRAP_COUNT  = 2 * FPS;  // Timer counter starting values
-  static final int HYPER_COUNT  = 3 * FPS;  // calculated using number of
-  static final int MISSLE_COUNT = 4 * FPS;  // seconds x frames per second.
-  static final int STORM_PAUSE  = 2 * FPS;
-
-  static final int    MIN_ROCK_SIDES =   6; // Ranges for asteroid shape, size
-  static final int    MAX_ROCK_SIDES =  16; // speed and rotation.
-  static final int    MIN_ROCK_SIZE  =  20;
-  static final int    MAX_ROCK_SIZE  =  40;
-  static final double MIN_ROCK_SPEED =  40.0 / FPS;
-  static final double MAX_ROCK_SPEED = 240.0 / FPS;
-  static final double MAX_ROCK_SPIN  = Math.PI / FPS;
-
   // Background stars.
-
   static int     numStars;
   static Point[] stars;
 
-
-  // Flags for looping sound clips.
-
-  static boolean thrustersPlaying;
-
-  // Counter and total used to track the loading of the sound clips.
-
-
   // Off screen image.
-
   Dimension offDimension;
   Image     offImage;
   Graphics  offGraphics;
 
   // Data for the screen font.
-
   Font font      = new Font("Helvetica", Font.BOLD, 12);
   FontMetrics fm = getFontMetrics(font);
   int fontWidth  = fm.getMaxAdvance();
@@ -303,38 +262,30 @@ public class Asteroids extends Applet implements Runnable {
   Game game = controller.getGame();
 
   public String getAppletInfo() {
-
     // Return copyright information.
-
     return(copyText);
   }
 
   public void init() {
-
     Dimension d = getSize();
     int i;
 
     // Display copyright information.
-
     System.out.println(copyText);
 
     // Set up key event handling and set focus to applet window.
-
     addKeyListener(controller);
     requestFocus();
 
     // Save the screen size.
-
     AsteroidsSprite.width = d.width;
     AsteroidsSprite.height = d.height;
 
     // Generate the starry background.
-
     numStars = AsteroidsSprite.width * AsteroidsSprite.height / 5000;
     stars = new Point[numStars];
     for (i = 0; i < numStars; i++)
       stars[i] = new Point((int) (Math.random() * AsteroidsSprite.width), (int) (Math.random() * AsteroidsSprite.height));
-
 
     game.initGame();
     endGame();
@@ -375,17 +326,13 @@ public class Asteroids extends Applet implements Runnable {
   }
 
   public void run() {
-
-    int i, j;
     long startTime;
 
     // Lower this thread's priority and get the current time.
-
     Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
     startTime = System.currentTimeMillis();
 
     // Run thread for loading sounds.
-
     if (!game.isLoaded() && Thread.currentThread() == loadThread) {
       loadSounds();
       game.setLoaded(true);
@@ -393,16 +340,13 @@ public class Asteroids extends Applet implements Runnable {
     }
 
     // This is the main loop.
-
     while (Thread.currentThread() == loopThread) {
-
       if (!game.isPaused()) {
 
         boolean shipUpdate = game.updateGame();
         if (shipUpdate) endGame();
 
         // Update the screen and set the timer for the next loop.
-
         repaint();
         try {
           startTime += DELAY;
@@ -462,125 +406,148 @@ public class Asteroids extends Applet implements Runnable {
   }
 
   public void paint(Graphics g) {
-
-
     Dimension d = getSize();
-    int i;
-    int c;
-    String s;
-    int w, h;
-    int x, y;
 
     // Create the off screen graphics context, if no good one exists.
-
     if (offGraphics == null || d.width != offDimension.width || d.height != offDimension.height) {
-      offDimension = d;
-      offImage = createImage(d.width, d.height);
-      offGraphics = offImage.getGraphics();
+      this.createOfScreen(d);
     }
 
     // Fill in background and stars.
-
-    offGraphics.setColor(Color.black);
-    offGraphics.fillRect(0, 0, d.width, d.height);
-    if (game.isDetail()) {
-      offGraphics.setColor(Color.white);
-      for (i = 0; i < numStars; i++)
-        offGraphics.drawLine(stars[i].x, stars[i].y, stars[i].x, stars[i].y);
-    }
+    this.fillBackgroundAndStars(d, game.isDetail());
 
     // Draw photon bullets.
-
-    offGraphics.setColor(Color.white);
-    for (i = 0; i < MAX_SHOTS; i++)
-      if (game.getPhotons()[i].isActive())
-        offGraphics.drawPolygon(game.getPhotons()[i].getSprite());
+    this.drawPhotons(game.getPhotons());
 
     // Draw the guided missle, counter is used to quickly fade color to black
     // when near expiration.
-
-    c = Math.min(game.missleCounter * 24, 255);
-    offGraphics.setColor(new Color(c, c, c));
-    if (game.getMissle().isActive()) {
-      offGraphics.drawPolygon(game.getMissle().getSprite());
-      offGraphics.drawLine(game.missle.sprite.xpoints[game.missle.sprite.npoints - 1], game.missle.sprite.ypoints[game.missle.sprite.npoints - 1],
-                           game.missle.sprite.xpoints[0], game.missle.sprite.ypoints[0]);
-    }
+    this.drawMissle(game.getMissleCounter(), game.getMissle());
 
     // Draw the asteroids.
-
-    for (i = 0; i < MAX_ROCKS; i++)
-      if (game.asteroids[i].isActive()) {
-        if (game.isDetail()) {
-          offGraphics.setColor(Color.black);
-          offGraphics.fillPolygon(game.asteroids[i].sprite);
-        }
-        offGraphics.setColor(Color.white);
-        offGraphics.drawPolygon(game.asteroids[i].sprite);
-        offGraphics.drawLine(game.asteroids[i].sprite.xpoints[game.asteroids[i].sprite.npoints - 1], game.asteroids[i].sprite.ypoints[game.asteroids[i].sprite.npoints - 1],
-                game.asteroids[i].sprite.xpoints[0], game.asteroids[i].sprite.ypoints[0]);
-      }
+    this.drawAsteroids(game.getAsteroids(), game.isDetail());
 
     // Draw the flying saucer.
-
     if (game.ufo.active) {
-      if (game.isDetail()) {
-        offGraphics.setColor(Color.black);
-        offGraphics.fillPolygon(game.ufo.sprite);
-      }
-      offGraphics.setColor(Color.white);
-      offGraphics.drawPolygon(game.ufo.sprite);
-      offGraphics.drawLine(game.ufo.sprite.xpoints[game.ufo.sprite.npoints - 1], game.ufo.sprite.ypoints[game.ufo.sprite.npoints - 1],
-              game.ufo.sprite.xpoints[0], game.ufo.sprite.ypoints[0]);
+      this.drawFlyingSaucer(game.getUfo(), game.isDetail());
     }
 
     // Draw the ship, counter is used to fade color to white on hyperspace.
-
-    c = 255 - (255 / HYPER_COUNT) * Game.hyperCounter;
-    if (game.getShip().isActive()) {
-      if (game.isDetail() && Game.hyperCounter == 0) {
-        offGraphics.setColor(Color.black);
-        offGraphics.fillPolygon(game.getShip().getSprite());
-      }
-      offGraphics.setColor(new Color(c, c, c));
-      offGraphics.drawPolygon(game.ship.sprite);
-      offGraphics.drawLine(game.ship.sprite.xpoints[game.ship.sprite.npoints - 1], game.ship.sprite.ypoints[game.ship.sprite.npoints - 1],
-              game.ship.sprite.xpoints[0], game.ship.sprite.ypoints[0]);
-
-      // Draw thruster exhaust if thrusters are on. Do it randomly to get a
-      // flicker effect.
-
-      if (!game.isPaused() && game.isDetail() && Math.random() < 0.5) {
-        if (game.isUp()) {
-          offGraphics.drawPolygon(game.ship.getFwdThruster().sprite);
-          offGraphics.drawLine(game.ship.getFwdThruster().sprite.xpoints[game.ship.getFwdThruster().sprite.npoints - 1], game.ship.getFwdThruster().sprite.ypoints[game.ship.getFwdThruster().sprite.npoints - 1],
-                  game.ship.getFwdThruster().sprite.xpoints[0], game.ship.getFwdThruster().sprite.ypoints[0]);
-        }
-        if (game.isDown()) {
-          offGraphics.drawPolygon(game.ship.getRevThruster().sprite);
-          offGraphics.drawLine(game.ship.getRevThruster().sprite.xpoints[game.ship.getRevThruster().sprite.npoints - 1], game.ship.getRevThruster().sprite.ypoints[game.ship.getRevThruster().sprite.npoints - 1],
-                  game.ship.getRevThruster().sprite.xpoints[0], game.ship.getRevThruster().sprite.ypoints[0]);
-        }
-      }
-    }
+    this.drawShip(game.getShip(), game.isDetail(), game.isPaused(), game.isUp(), game.isDown());
 
     // Draw any explosion debris, counters are used to fade color to black.
-
-    for (i = 0; i < MAX_SCRAP; i++)
-      if (game.explosions[i].isActive()) {
-        c = (255 / SCRAP_COUNT) * game.getExplosionCounter() [i];
-        offGraphics.setColor(new Color(c, c, c));
-        offGraphics.drawPolygon(game.explosions[i].sprite);
-      }
+    this.drawDebris(game.getExplosions(), game.getExplosionCounter());
 
     // Display status and messages.
+    this.displayMessagesAndStatus(d);
 
+    // Copy the off screen buffer to the screen.
+    g.drawImage(offImage, 0, 0, this);
+  }
+
+  private void createOfScreen(Dimension d) {
+    offDimension = d;
+    offImage = createImage(d.width, d.height);
+    offGraphics = offImage.getGraphics();
+  }
+
+  private void fillBackgroundAndStars(Dimension d, boolean detailed) {
+    offGraphics.setColor(Color.black);
+    offGraphics.fillRect(0, 0, d.width, d.height);
+    if (detailed) {
+      offGraphics.setColor(Color.white);
+      for (int i = 0; i < numStars; i++)
+        offGraphics.drawLine(stars[i].x, stars[i].y, stars[i].x, stars[i].y);
+    }
+  }
+
+  private void drawPhotons(Photon[] photons) {
+    offGraphics.setColor(Color.white);
+    for (int i = 0; i < Game.MAX_SHOTS; i++)
+      if (photons[i].isActive())
+        offGraphics.drawPolygon(photons[i].getSprite());
+  }
+
+  private void drawMissle(int missleCounter, Missile missile) {
+    int c = Math.min(missleCounter * 24, 255);
+    offGraphics.setColor(new Color(c, c, c));
+    if (missile.isActive()) {
+      offGraphics.drawPolygon(missile.getSprite());
+      offGraphics.drawLine(missile.getSprite().xpoints[missile.getSprite().npoints - 1], missile.getSprite().ypoints[missile.getSprite().npoints - 1],
+              missile.getSprite().xpoints[0], missile.getSprite().ypoints[0]);
+    }
+
+  }
+
+  private void drawAsteroids(Asteroid[] asteroids, boolean detailed) {
+    for (int i = 0; i < Game.MAX_ROCKS; i++)
+      if (asteroids[i].isActive()) {
+        if (detailed) {
+          offGraphics.setColor(Color.black);
+          offGraphics.fillPolygon(game.getAsteroids()[i].getSprite());
+        }
+        offGraphics.setColor(Color.white);
+        offGraphics.drawPolygon(asteroids[i].getSprite());
+        offGraphics.drawLine(asteroids[i].getSprite().xpoints[asteroids[i].getSprite().npoints - 1], asteroids[i].getSprite().ypoints[asteroids[i].getSprite().npoints - 1],
+                asteroids[i].getSprite().xpoints[0], asteroids[i].getSprite().ypoints[0]);
+      }
+  }
+
+  private void drawFlyingSaucer(Ufo ufo, boolean detailed) {
+    if (detailed) {
+      offGraphics.setColor(Color.black);
+      offGraphics.fillPolygon(ufo.getSprite());
+    }
+    offGraphics.setColor(Color.white);
+    offGraphics.drawPolygon(ufo.getSprite());
+    offGraphics.drawLine(ufo.getSprite().xpoints[game.ufo.sprite.npoints - 1], ufo.getSprite().ypoints[ufo.getSprite().npoints - 1],
+            ufo.getSprite().xpoints[0], ufo.getSprite().ypoints[0]);
+
+  }
+
+  private void drawShip(Ship ship, boolean detailed, boolean paused, boolean up, boolean down) {
+    int c = 255 - (255 / Game.HYPER_COUNT) * Game.hyperCounter;
+    if (ship.isActive()) {
+      if (detailed && Game.hyperCounter == 0) {
+        offGraphics.setColor(Color.black);
+        offGraphics.fillPolygon(ship.getSprite());
+      }
+      offGraphics.setColor(new Color(c, c, c));
+      offGraphics.drawPolygon(ship.getSprite());
+      offGraphics.drawLine(ship.getSprite().xpoints[ship.getSprite().npoints - 1], ship.getSprite().ypoints[ship.getSprite().npoints - 1],
+              ship.getSprite().xpoints[0], ship.getSprite().ypoints[0]);
+
+    }
+
+    if (!paused && detailed && Math.random() < 0.5) {
+      if (up) {
+        offGraphics.drawPolygon(ship.getFwdThruster().getSprite());
+        offGraphics.drawLine(ship.getFwdThruster().getSprite().xpoints[ship.getFwdThruster().getSprite().npoints - 1], ship.getFwdThruster().getSprite().ypoints[ship.getFwdThruster().getSprite().npoints - 1],
+                ship.getFwdThruster().getSprite().xpoints[0], ship.getFwdThruster().getSprite().ypoints[0]);
+      }
+      if (down) {
+        offGraphics.drawPolygon(ship.getRevThruster().getSprite());
+        offGraphics.drawLine(ship.getRevThruster().getSprite().xpoints[ship.getRevThruster().getSprite().npoints - 1], ship.getRevThruster().getSprite().ypoints[ship.getRevThruster().getSprite().npoints - 1],
+                ship.getRevThruster().getSprite().xpoints[0], ship.getRevThruster().getSprite().ypoints[0]);
+      }
+    }
+  }
+
+  private void drawDebris(Explosion[] explosions, int[] explosionCounter) {
+    for (int i = 0; i < Game.MAX_SCRAP; i++)
+      if (explosions[i].isActive()) {
+        int c = (255 / Game.SCRAP_COUNT) * explosionCounter [i];
+        offGraphics.setColor(new Color(c, c, c));
+        offGraphics.drawPolygon(explosions[i].getSprite());
+      }
+  }
+
+  private void displayMessagesAndStatus(Dimension d) {
     offGraphics.setFont(font);
     offGraphics.setColor(Color.white);
 
     offGraphics.drawString("Score: " + game.getScore(), fontWidth, fontHeight);
     offGraphics.drawString("Ships: " + game.getShipsLeft(), fontWidth, d.height - fontHeight);
-    s = "High: " + game.getHighScore();
+    String s = "High: " + game.getHighScore();
     offGraphics.drawString(s, d.width - (fontWidth + fm.stringWidth(s)), fontHeight);
     if (!game.sound) {
       s = "Mute";
@@ -598,15 +565,15 @@ public class Asteroids extends Applet implements Runnable {
       offGraphics.drawString(s, (d.width - fm.stringWidth(s)) / 2, d.height / 2 + 2 * fontHeight);
       if (!game.isLoaded()) {
         s = "Loading sounds...";
-        w = 4 * fontWidth + fm.stringWidth(s);
-        h = fontHeight;
-        x = (d.width - w) / 2;
-        y = 3 * d.height / 4 - fm.getMaxAscent();
+        int w = 4 * fontWidth + fm.stringWidth(s);
+        int h = fontHeight;
+        int x = (d.width - w) / 2;
+        int y = 3 * d.height / 4 - fm.getMaxAscent();
         offGraphics.setColor(Color.black);
-          offGraphics.fillRect(x, y, w, h);
+        offGraphics.fillRect(x, y, w, h);
         offGraphics.setColor(Color.gray);
         if (game.clipTotal > 0)
-          offGraphics.fillRect(x, y, (int) (w * game.clipsLoaded / game.clipTotal), h);
+          offGraphics.fillRect(x, y, (int) (w * game.getClipsLoaded() / game.getClipTotal()), h);
         offGraphics.setColor(Color.white);
         offGraphics.drawRect(x, y, w, h);
         offGraphics.drawString(s, x + 2 * fontWidth, y + fm.getMaxAscent());
@@ -622,9 +589,6 @@ public class Asteroids extends Applet implements Runnable {
       s = "Game Paused";
       offGraphics.drawString(s, (d.width - fm.stringWidth(s)) / 2, d.height / 4);
     }
-
-    // Copy the off screen buffer to the screen.
-
-    g.drawImage(offImage, 0, 0, this);
   }
+
 }

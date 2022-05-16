@@ -185,16 +185,8 @@ public class Game {
 
     //getters --------------------------------------------
 
-    public boolean isLeft() {
-        return left;
-    }
-
-    public boolean isRight() {
-        return right;
-    }
-
     public boolean isUp() {
-        return right;
+        return up;
     }
 
     public boolean isDown() {
@@ -232,6 +224,22 @@ public class Game {
         return explosionCounter;
     }
 
+    public int getMissleCounter() {
+        return missleCounter;
+    }
+
+    public int getClipsLoaded() {
+        return clipsLoaded;
+    }
+
+    public int getClipTotal() {
+        return clipTotal;
+    }
+
+    public Asteroid[] getAsteroids() {
+        return asteroids;
+    }
+
     public Ship getShip() {
         return ship;
     }
@@ -242,6 +250,14 @@ public class Game {
 
     public Missile getMissle() {
         return missle;
+    }
+
+    public Ufo getUfo() {
+        return ufo;
+    }
+
+    public Explosion[] getExplosions() {
+        return explosions;
     }
 
     //setters ----------------------------------------------
@@ -256,7 +272,7 @@ public class Game {
         this.up = up;
     }
 
-    public void setDown(boolean down) {this.right = down;}
+    public void setDown(boolean down) {this.down = down;}
 
     public void setPaused(boolean paused) {
         this.paused = paused;
@@ -659,7 +675,7 @@ public class Game {
             fireSound.play();
         photonTime = System.currentTimeMillis();
         photonIndex++;
-        if (photonIndex >= Asteroids.MAX_SHOTS)
+        if (photonIndex >= Game.MAX_SHOTS)
             photonIndex = 0;
         photons[photonIndex].active = true;
         photons[photonIndex].x = ship.x;

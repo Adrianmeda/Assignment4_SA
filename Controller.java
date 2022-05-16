@@ -1,7 +1,7 @@
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
-public class Controller implements KeyListener, Runnable {
+public class Controller implements KeyListener {
 
     private Game game = new Game();
 
@@ -135,10 +135,7 @@ public class Controller implements KeyListener, Runnable {
 
     }
 
-    @Override
-    public void run() {
 
-    }
 }
 
 
