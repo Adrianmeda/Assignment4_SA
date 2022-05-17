@@ -1,21 +1,21 @@
 public class Missile extends AsteroidsSprite{
 
     public Missile(double ufoX, double ufoY) {
-        this.shape.addPoint(0, -4);
-        this.shape.addPoint(1, -3);
-        this.shape.addPoint(1, 3);
-        this.shape.addPoint(2, 4);
-        this.shape.addPoint(-2, 4);
-        this.shape.addPoint(-1, 3);
-        this.shape.addPoint(-1, -3);
+        this.getShape().addPoint(0, -4);
+        this.getShape().addPoint(1, -3);
+        this.getShape().addPoint(1, 3);
+        this.getShape().addPoint(2, 4);
+        this.getShape().addPoint(-2, 4);
+        this.getShape().addPoint(-1, 3);
+        this.getShape().addPoint(-1, -3);
 
-        this.active = true;
-        this.angle = 0.0;
-        this.deltaAngle = 0.0;
-        this.x = ufoX;
-        this.y = ufoY;
-        this.deltaX = 0.0;
-        this.deltaY = 0.0;
+        this.setActive(true);
+        this.setAngle(0.0);
+        this.setDeltaAngle(0.0);
+        this.setX(ufoX);
+        this.setY(ufoY);
+        this.setX(0.0);
+        this.setY(0.0);
 
     }
 
@@ -42,11 +42,11 @@ public class Missile extends AsteroidsSprite{
 
         // Adjust angle for screen coordinates.
 
-        this.angle = angle - Math.PI / 2;
+        this.setAngle(angle - Math.PI / 2);
 
         // Change the missle's angle so that it points toward the ship.
 
-        this.deltaX = 0.75 * Game.MAX_ROCK_SPEED * -Math.sin(this.angle);
-        this.deltaY = 0.75 * Game.MAX_ROCK_SPEED *  Math.cos(this.angle);
+        this.setDeltaX(0.75 * Game.MAX_ROCK_SPEED * -Math.sin(this.getAngle()));
+        this.setDeltaY(0.75 * Game.MAX_ROCK_SPEED *  Math.cos(this.getAngle()));
     }
 }

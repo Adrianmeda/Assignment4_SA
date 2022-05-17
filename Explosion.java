@@ -3,12 +3,8 @@ import java.awt.*;
 public class Explosion extends AsteroidsSprite{
 
     public Explosion() {
-        this.shape = new Polygon();
-        this.active = false;
-    }
-
-    public void setShape(AsteroidsSprite sprite) {
-
+        this.setShape(new Polygon());
+        this.setActive(false);
     }
 
 }

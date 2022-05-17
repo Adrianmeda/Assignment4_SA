@@ -1,41 +1,35 @@
 import java.applet.AudioClip;
-import java.awt.*;
 
 public class Game {
 
     // Constants
 
-    static final int DELAY = 20;             // Milliseconds between screen and
-    static final int FPS =                 // the resulting frame rate.
+   public static final int DELAY = 20;             // Milliseconds between screen and
+   public static final int FPS =                 // the resulting frame rate.
             Math.round(1000 / DELAY);
 
-    static final int MAX_SHOTS = 8;          // Maximum number of sprites
-    static final int MAX_ROCKS = 8;          // for photons, asteroids and
-    static final int MAX_SCRAP = 40;          // explosions.
+   public static final int MAX_SHOTS = 8;          // Maximum number of sprites
+   public static final int MAX_ROCKS = 8;          // for photons, asteroids and
+   public static final int MAX_SCRAP = 40;          // explosions.
 
-    static final int SCRAP_COUNT = 2 * FPS;  // Timer counter starting values
-    static final int HYPER_COUNT = 3 * FPS;  // calculated using number of
-    static final int MISSLE_COUNT = 4 * FPS;  // seconds x frames per second.
-    static final int STORM_PAUSE = 2 * FPS;
+   public static final int SCRAP_COUNT = 2 * FPS;  // Timer counter starting values
+   public static final int HYPER_COUNT = 3 * FPS;  // calculated using number of
+   public static final int MISSLE_COUNT = 4 * FPS;  // seconds x frames per second.
+   public static final int STORM_PAUSE = 2 * FPS;
 
-    static final int MIN_ROCK_SIDES = 6; // Ranges for asteroid shape, size
-    static final int MAX_ROCK_SIDES = 16; // speed and rotation.
-    static final int MIN_ROCK_SIZE = 20;
-    static final int MAX_ROCK_SIZE = 40;
-    static final double MIN_ROCK_SPEED = 40.0 / FPS;
-    static final double MAX_ROCK_SPEED = 240.0 / FPS;
-    static final double MAX_ROCK_SPIN = Math.PI / FPS;
+   public static final int MIN_ROCK_SIDES = 6; // Ranges for asteroid shape, size
+   public static final int MAX_ROCK_SIDES = 16; // speed and rotation.
+   public static final int MIN_ROCK_SIZE = 20;
+   public static final int MAX_ROCK_SIZE = 40;
+   public static final double MIN_ROCK_SPEED = 40.0 / FPS;
+   public static final double MAX_ROCK_SPEED = 240.0 / FPS;
+   public static final double MAX_ROCK_SPIN = Math.PI / FPS;
 
     static final int MAX_SHIPS = 3;           // Starting number of ships for
     // each game.
+
     static final int UFO_PASSES = 3;          // Number of passes for flying
     // saucer per appearance.
-
-    // Ship's rotation and acceleration rates and maximum speed.
-
-    static final double SHIP_ANGLE_STEP = Math.PI / FPS;
-    static final double SHIP_SPEED_STEP = 15.0 / FPS;
-    static final double MAX_SHIP_SPEED = 1.25 * MAX_ROCK_SPEED;
 
     static final int FIRE_DELAY = 50;         // Minimum number of milliseconds
     // required between photon shots.
@@ -55,11 +49,6 @@ public class Game {
 
     static final int NEW_SHIP_POINTS = 5000;
     static final int NEW_UFO_POINTS = 2750;
-
-    // Background stars.
-
-    int numStars;
-    Point[] stars;
 
     // Game data.
 
@@ -96,7 +85,7 @@ public class Game {
 
     private int shipsLeft;       // Number of ships left in game, including current one.
     private int shipCounter;     // Timer counter for ship explosion.
-    static int hyperCounter;    // Timer counter for hyperspace.
+    public static int hyperCounter;    // Timer counter for hyperspace.
 
 
     // Photon data.
@@ -143,15 +132,11 @@ public class Game {
 
     // Counter and total used to track the loading of the sound clips.
 
-    int clipTotal = 0;
-    int clipsLoaded = 0;
+    public int clipTotal = 0;
+    public int clipsLoaded = 0;
 
 
     public Game() {
-        numStars = AsteroidsSprite.width * AsteroidsSprite.height / 5000;
-        stars = new Point[numStars];
-        for (int i = 0; i < numStars; i++)
-            stars[i] = new Point((int) (Math.random() * AsteroidsSprite.width), (int) (Math.random() * AsteroidsSprite.height));
 
         // Create shape for the ship sprite.
         // Create shapes for the ship thrusters.
@@ -327,7 +312,7 @@ public class Game {
         photonTime = System.currentTimeMillis();
     }
 
-    public void initShip() {
+    private void initShip() {
 
         // Reset the ship sprite at the center of the screen.
 
@@ -339,7 +324,7 @@ public class Game {
         hyperCounter = 0;
     }
 
-    public void initAsteroids() {
+    private void initAsteroids() {
 
         // Create random shapes, positions and movements for each asteroid.
 
@@ -355,7 +340,7 @@ public class Game {
             asteroidsSpeed += 0.5;
     }
 
-    public void initSmallAsteroids(int n) {
+    private void initSmallAsteroids(int n) {
 
         int count;
         int i;
@@ -382,7 +367,7 @@ public class Game {
         } while (i < MAX_ROCKS && count < 2);
     }
 
-    public void initExplosions() {
+    private void initExplosions() {
 
         int i;
 
@@ -393,15 +378,15 @@ public class Game {
         explosionIndex = 0;
     }
 
-    public void initUfo() {
+    private void initUfo() {
         ufo.render();
         saucerPlaying = true;
         if (sound)
             saucerSound.loop();
-        ufoCounter = (int) Math.abs(AsteroidsSprite.width / ufo.deltaX);
+        ufoCounter = (int) Math.abs(AsteroidsSprite.width / ufo.getDeltaX());
     }
 
-    public void initMissle() {
+    private void initMissle() {
         missle.render();
         missleCounter = MISSLE_COUNT;
         if (sound)
@@ -477,7 +462,7 @@ public class Game {
 
     }
 
-    public boolean updateShip() {
+    private boolean updateShip() {
         if (!playing)
             return false;
 
@@ -517,22 +502,22 @@ public class Game {
         return false;
     }
 
-    public void updatePhotons() {
+    private void updatePhotons() {
 
         int i;
 
         // Move any active photons. Stop it when its counter has expired.
 
         for (i = 0; i < MAX_SHOTS; i++)
-            if (photons[i].active) {
+            if (photons[i].isActive()) {
                 if (!photons[i].advance())
                     photons[i].render();
                 else
-                    photons[i].active = false;
+                    photons[i].setActive(false);
             }
     }
 
-    public void updateUfo() {
+    private void updateUfo() {
 
         int i, d;
         boolean wrapped;
@@ -551,7 +536,7 @@ public class Game {
                 ufo.advance();
                 ufo.render();
                 for (i = 0; i < MAX_SHOTS; i++)
-                    if (photons[i].active && ufo.isColliding(photons[i])) {
+                    if (photons[i].isActive() && ufo.isColliding(photons[i])) {
                         if (sound)
                             crashSound.play();
                         explode(ufo);
@@ -562,9 +547,9 @@ public class Game {
                 // On occassion, fire a missle at the ship if the saucer is not too
                 // close to it.
 
-                d = (int) Math.max(Math.abs(ufo.x - ship.x), Math.abs(ufo.y - ship.y));
+                d = (int) Math.max(Math.abs(ufo.getX() - ship.getY()), Math.abs(ufo.getY() - ship.getY()));
                 if (ship.isActive() && hyperCounter <= 0 &&
-                        ufo.active && !missle.active &&
+                        ufo.isActive() && !missle.isActive() &&
                         d > MAX_ROCK_SPEED * FPS / 2 &&
                         Math.random() < MISSLE_PROBABILITY)
                     initMissle();
@@ -572,7 +557,7 @@ public class Game {
         }
     }
 
-    public void updateMissle() {
+    private void updateMissle() {
 
         // Move the guided missle and check for collision with ship or photon. Stop
         // it when its counter has expired.
@@ -605,7 +590,7 @@ public class Game {
         }
     }
 
-    public void updateAsteroids() {
+    private void updateAsteroids() {
 
         int i, j;
 
@@ -638,7 +623,7 @@ public class Game {
                 // If the ship is not in hyperspace, see if it is hit.
 
                 if (ship.isActive() && hyperCounter <= 0 &&
-                        asteroids[i].active && asteroids[i].isColliding(ship)) {
+                        asteroids[i].isActive() && asteroids[i].isColliding(ship)) {
                     if (sound)
                         crashSound.play();
                     explode(ship);
@@ -649,7 +634,7 @@ public class Game {
             }
     }
 
-    public void updateExplosions() {
+    private void updateExplosions() {
 
         int i;
 
@@ -693,11 +678,11 @@ public class Game {
         photonIndex++;
         if (photonIndex >= Game.MAX_SHOTS)
             photonIndex = 0;
-        photons[photonIndex].active = true;
-        photons[photonIndex].x = ship.x;
-        photons[photonIndex].y = ship.y;
-        photons[photonIndex].deltaX = 2 * MAX_ROCK_SPEED * -Math.sin(ship.angle);
-        photons[photonIndex].deltaY = 2 * MAX_ROCK_SPEED *  Math.cos(ship.angle);
+        photons[photonIndex].setActive(true);
+        photons[photonIndex].setX(ship.getX());
+        photons[photonIndex].setY(ship.getY());
+        photons[photonIndex].setDeltaX(2 * MAX_ROCK_SPEED * -Math.sin(ship.getAngle()));
+        photons[photonIndex].setDeltaY(2 * MAX_ROCK_SPEED *  Math.cos(ship.getAngle()));
     }
 
     public void warpShip() {

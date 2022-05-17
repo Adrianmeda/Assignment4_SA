@@ -34,191 +34,9 @@
 ******************************************************************************/
 
 import java.applet.Applet;
-import java.applet.AppletContext;
-import java.applet.AudioClip;
 import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.net.MalformedURLException;
 import java.net.URL;
-
-/******************************************************************************
-  The AsteroidsSprite class defines a game object, including it's shape,
-  position, movement and rotation. It also can detemine if two objects collide.
-******************************************************************************/
-
-abstract class AsteroidsSprite {
-
-  // Fields:
-
-  static int width;          // Dimensions of the graphics area.
-  static int height;
-
-  Polygon shape;             // Base sprite shape, centered at the origin (0,0).
-  boolean active;            // Active flag.
-  double  angle;             // Current angle of rotation.
-  double  deltaAngle;        // Amount to change the rotation angle.
-  double  x, y;              // Current position on screen.
-  double  deltaX, deltaY;    // Amount to change the screen position.
-  Polygon sprite;            // Final location and shape of sprite after
-                             // applying rotation and translation to get screen
-                             // position. Used for drawing on the screen and in
-                             // detecting collisions.
-
-  // Constructors:
-
-  public AsteroidsSprite() {
-
-    this.shape = new Polygon();
-    this.active = false;
-    this.angle = 0.0;
-    this.deltaAngle = 0.0;
-    this.x = 0.0;
-    this.y = 0.0;
-    this.deltaX = 0.0;
-    this.deltaY = 0.0;
-    this.sprite = new Polygon();
-  }
-
-
-  // Methods:
-  public double getX() {
-    return this.x;
-  }
-
-  public double getY() {
-    return this.y;
-  }
-
-  public Polygon getSprite() {
-    return sprite;
-  }
-
-  public boolean isActive() {
-    return this.active;
-  }
-
-  public boolean isColliding(AsteroidsSprite s) {
-
-    int i;
-
-    // Determine if one sprite overlaps with another, i.e., if any vertice
-    // of one sprite lands inside the other.
-
-    for (i = 0; i < s.sprite.npoints; i++)
-      if (this.sprite.contains(s.sprite.xpoints[i], s.sprite.ypoints[i]))
-        return true;
-    for (i = 0; i < this.sprite.npoints; i++)
-      if (s.sprite.contains(this.sprite.xpoints[i], this.sprite.ypoints[i]))
-        return true;
-    return false;
-  }
-
-
-
-  public void setX(double x) {
-    this.x = x;
-  }
-
-  public void setY(double y) {
-    this.y = y;
-  }
-
-
-
-  public boolean advance() {
-
-    boolean wrapped;
-
-    // Update the rotation and position of the sprite based on the delta
-    // values. If the sprite moves off the edge of the screen, it is wrapped
-    // around to the other side and TRUE is returnd.
-
-    this.angle += this.deltaAngle;
-    if (this.angle < 0)
-      this.angle += 2 * Math.PI;
-    if (this.angle > 2 * Math.PI)
-      this.angle -= 2 * Math.PI;
-    wrapped = false;
-    this.x += this.deltaX;
-    if (this.x < -width / 2) {
-      this.x += width;
-      wrapped = true;
-    }
-    if (this.x > width / 2) {
-      this.x -= width;
-      wrapped = true;
-    }
-    this.y -= this.deltaY;
-    if (this.y < -height / 2) {
-      this.y += height;
-      wrapped = true;
-    }
-    if (this.y > height / 2) {
-      this.y -= height;
-      wrapped = true;
-    }
-
-    return wrapped;
-  }
-
-  public void render() {
-
-    int i;
-
-    // Render the sprite's shape and location by rotating it's base shape and
-    // moving it to it's proper screen position.
-
-    this.sprite = new Polygon();
-    for (i = 0; i < this.shape.npoints; i++)
-      this.sprite.addPoint((int) Math.round(this.shape.xpoints[i] * Math.cos(this.angle) + this.shape.ypoints[i] * Math.sin(this.angle)) + (int) Math.round(this.x) + width / 2,
-                           (int) Math.round(this.shape.ypoints[i] * Math.cos(this.angle) - this.shape.xpoints[i] * Math.sin(this.angle)) + (int) Math.round(this.y) + height / 2);
-  }
-
-  public void activate() {
-    this.active = true;
-  }
-
-  public void stop() {
-    this.active = false;
-  }
-
-  public void explode(Explosion[] explosions, int[] explosionCounter, boolean detail) {
-    int c, i, j;
-    int cx, cy;
-
-    c = 2;
-    if (detail || this.sprite.npoints < 6)
-      c = 1;
-    for (i = 0; i < this.sprite.npoints; i += c) {
-      Game.explosionIndex++;
-      if (Game.explosionIndex >= Game.MAX_SCRAP)
-        Game.explosionIndex = 0;
-      explosions[Game.explosionIndex].activate();
-      explosions[Game.explosionIndex].shape = new Polygon();
-      j = i + 1;
-      if (j >= this.sprite.npoints)
-        j -= this.sprite.npoints;
-      cx = (int) ((this.shape.xpoints[i] + this.shape.xpoints[j]) / 2);
-      cy = (int) ((this.shape.ypoints[i] + this.shape.ypoints[j]) / 2);
-      explosions[Game.explosionIndex].shape.addPoint(
-              this.shape.xpoints[i] - cx,
-              this.shape.ypoints[i] - cy);
-      explosions[Game.explosionIndex].shape.addPoint(
-              this.shape.xpoints[j] - cx,
-              this.shape.ypoints[j] - cy);
-      explosions[Game.explosionIndex].x = this.x + cx;
-      explosions[Game.explosionIndex].y = this.y + cy;
-      explosions[Game.explosionIndex].angle = this.angle;
-      explosions[Game.explosionIndex].deltaAngle = 4 * (Math.random() * 2 * Game.MAX_ROCK_SPIN - Game.MAX_ROCK_SPIN);
-      explosions[Game.explosionIndex].deltaX = (Math.random() * 2 * Game.MAX_ROCK_SPEED - Game.MAX_ROCK_SPEED + this.deltaX) / 2;
-      explosions[Game.explosionIndex].deltaY = (Math.random() * 2 * Game.MAX_ROCK_SPEED - Game.MAX_ROCK_SPEED + this.deltaY) / 2;
-      explosionCounter[Game.explosionIndex] = Game.SCRAP_COUNT;
-    }
-
-  }
-
-}
 
 /******************************************************************************
   Main applet code.
@@ -235,31 +53,31 @@ public class Asteroids extends Applet implements Runnable {
                   + copyInfo + '\n' + copyLink;
 
   // Thread control variables.
-  Thread loadThread;
-  Thread loopThread;
+  private Thread loadThread;
+  private Thread loopThread;
 
   // Constants
-  static final int DELAY = 20;             // Milliseconds between screen and
-  static final int FPS   =                 // the resulting frame rate.
+  public static final int DELAY = 20;             // Milliseconds between screen and
+  public static final int FPS   =                 // the resulting frame rate.
     Math.round(1000 / DELAY);
 
   // Background stars.
-  static int     numStars;
-  static Point[] stars;
+  private int     numStars;
+  private Point[] stars;
 
   // Off screen image.
-  Dimension offDimension;
-  Image     offImage;
-  Graphics  offGraphics;
+  private Dimension offDimension;
+  private Image     offImage;
+  private Graphics  offGraphics;
 
   // Data for the screen font.
-  Font font      = new Font("Helvetica", Font.BOLD, 12);
-  FontMetrics fm = getFontMetrics(font);
-  int fontWidth  = fm.getMaxAdvance();
-  int fontHeight = fm.getHeight();
+  private Font font      = new Font("Helvetica", Font.BOLD, 12);
+  private FontMetrics fm = getFontMetrics(font);
+  private int fontWidth  = fm.getMaxAdvance();
+  private int fontHeight = fm.getHeight();
 
-  static Controller controller = new Controller();
-  Game game = controller.getGame();
+  private static Controller controller = new Controller();
+  private Game game = controller.getGame();
 
   public String getAppletInfo() {
     // Return copyright information.
@@ -287,7 +105,6 @@ public class Asteroids extends Applet implements Runnable {
     for (i = 0; i < numStars; i++)
       stars[i] = new Point((int) (Math.random() * AsteroidsSprite.width), (int) (Math.random() * AsteroidsSprite.height));
 
-    game.initGame();
     endGame();
   }
 
@@ -414,7 +231,7 @@ public class Asteroids extends Applet implements Runnable {
     }
 
     // Fill in background and stars.
-    this.fillBackgroundAndStars(d, game.isDetail());
+    this.fillBackgroundAndStars(d, stars, numStars, game.isDetail());
 
     // Draw photon bullets.
     this.drawPhotons(game.getPhotons());
@@ -450,7 +267,7 @@ public class Asteroids extends Applet implements Runnable {
     offGraphics = offImage.getGraphics();
   }
 
-  private void fillBackgroundAndStars(Dimension d, boolean detailed) {
+  private void fillBackgroundAndStars(Dimension d, Point[] stars, int numStars,boolean detailed) {
     offGraphics.setColor(Color.black);
     offGraphics.fillRect(0, 0, d.width, d.height);
     if (detailed) {
@@ -499,7 +316,7 @@ public class Asteroids extends Applet implements Runnable {
     }
     offGraphics.setColor(Color.white);
     offGraphics.drawPolygon(ufo.getSprite());
-    offGraphics.drawLine(ufo.getSprite().xpoints[ufo.sprite.npoints - 1], ufo.getSprite().ypoints[ufo.getSprite().npoints - 1],
+    offGraphics.drawLine(ufo.getSprite().xpoints[ufo.getSprite().npoints - 1], ufo.getSprite().ypoints[ufo.getSprite().npoints - 1],
             ufo.getSprite().xpoints[0], ufo.getSprite().ypoints[0]);
 
   }

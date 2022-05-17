@@ -10,17 +10,16 @@ public class Ship extends AsteroidsSprite{
 
     public Ship() {
 
-        this.shape.addPoint(0, -10);
-        this.shape.addPoint(7, 10);
-        this.shape.addPoint(-7, 10);
+        this.getShape().addPoint(0, -10);
+        this.getShape().addPoint(7, 10);
+        this.getShape().addPoint(-7, 10);
 
-        this.active = true;
-        this.angle = 0.0;
-        this.deltaAngle = 0.0;
-        this.x = 0.0;
-        this.y = 0.0;
-        this.deltaX = 0.0;
-        this.deltaY = 0.0;
+        this.setActive(true);
+        this.setAngle(0.0);
+        this.setDeltaAngle(0.0);
+        this.setX(0.0);
+        this.setY(0.0);
+        this.setX(0.0);
         this.render();
 
         fwdThruster = new FwdThruster(this);
@@ -42,58 +41,61 @@ public class Ship extends AsteroidsSprite{
     public void update(boolean right, boolean left, boolean up, boolean down) {
 
         double dx, dy, speed;
-
+        double tempAngle = this.getAngle();
         if (left) {
-            this.angle += SHIP_ANGLE_STEP;
-            if (this.angle > 2 * Math.PI)
-                this.angle -= 2 * Math.PI;
+            this.setAngle(tempAngle += SHIP_ANGLE_STEP);
+            if (this.getAngle() > 2 * Math.PI)
+                tempAngle = this.getAngle();
+                this.setAngle(tempAngle -= 2 * Math.PI); ;
         }
         if (right) {
-            this.angle -= SHIP_ANGLE_STEP;
-            if (this.angle < 0)
-                this.angle += 2 * Math.PI;
+            tempAngle = this.getAngle();
+            this.setAngle(tempAngle -= SHIP_ANGLE_STEP);
+            if (this.getAngle() < 0)
+                tempAngle = this.getAngle();
+                this.setAngle(tempAngle += 2 * Math.PI);
         }
 
         // Fire thrusters if up or down cursor key is down.
 
-        dx = SHIP_SPEED_STEP * -Math.sin(this.angle);
-        dy = SHIP_SPEED_STEP *  Math.cos(this.angle);
+        dx = SHIP_SPEED_STEP * -Math.sin(this.getAngle());
+        dy = SHIP_SPEED_STEP *  Math.cos(this.getAngle());
         if (up) {
-            this.deltaX += dx;
-            this.deltaY += dy;
+            this.setDeltaX(this.getDeltaX() + dx);
+            this.setDeltaY(this.getDeltaY() + dy);
         }
         if (down) {
-            this.deltaX -= dx;
-            this.deltaY -= dy;
+            this.setDeltaX(this.getDeltaX() - dx);
+            this.setDeltaY(this.getDeltaY() - dy);
         }
 
         // Don't let ship go past the speed limit.
 
         if (up || down) {
-            speed = Math.sqrt(this.deltaX * this.deltaX + this.deltaY * this.deltaY);
+            speed = Math.sqrt(this.getDeltaX() * this.getDeltaX() + this.getDeltaY() * this.getDeltaY());
             if (speed > MAX_SHIP_SPEED) {
-                dx = MAX_SHIP_SPEED * -Math.sin(this.angle);
-                dy = MAX_SHIP_SPEED *  Math.cos(this.angle);
+                dx = MAX_SHIP_SPEED * -Math.sin(this.getAngle());
+                dy = MAX_SHIP_SPEED *  Math.cos(this.getAngle());
                 if (up)
-                    this.deltaX = dx;
+                    this.setDeltaX(dx);
                 else
-                    this.deltaX = -dx;
+                    this.setDeltaX(-dx);
                 if (up)
-                    this.deltaY = dy;
+                    this.setDeltaY(dy);
                 else
-                    this.deltaY = -dy;
+                    this.setDeltaY(-dy);
             }
         }
     }
 
     public void updateThrusters() {
-        fwdThruster.x = this.x;
-        fwdThruster.y = this.y;
-        fwdThruster.angle = this.angle;
+        fwdThruster.setX(this.getX());
+        fwdThruster.setY(this.getY());
+        fwdThruster.setAngle(this.getAngle());
 
-        revThruster.x = this.x;
-        revThruster.y = this.y;
-        revThruster.angle = this.angle;
+        revThruster.setX(this.getX());
+        revThruster.setY(this.getY());
+        revThruster.setAngle(this.getAngle());
 
     }
 
